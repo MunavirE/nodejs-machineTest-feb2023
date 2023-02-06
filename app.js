@@ -72,6 +72,30 @@ app.put("/product", (req, res) => {
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
     //loop through the product to get the product match
+    for (i = 0; i < productData.length; i++) {
+        if (productData[i].productId == valuesToUpdate.productId) {
+            //Copying the existing product with the updated details
+            newUpdatedProduct = Object.assign(productData[i], valuesToUpdate)
+            if (req.file) {
+                upload.array('images')
+                newUpdatedProduct.imageUrl = `http://localhost:8080/productImage/${req.file.filename}`
+            }
+            //calculating price 
+            newUpdatedProduct.price = newUpdatedProduct.mrp - (newUpdatedProduct.discount + newUpdatedProduct.shippingCharge)
+            //replace the existing product with the new updated product
+            productData.splice(i, 1, newUpdatedProduct)
+            //write to a file
+            fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
+                if (err)
+                    console.error(err)
+            })
+            //return response with updated details
+            res.send(newUpdatedProduct)
+        }
+        else {
+            res.status(404).send("No data found")
+        }
+    }
     productData.map((productItem) => {
         if (productItem.productId == valuesToUpdate.productId) {
             //Copying the existing product with the updated details
@@ -80,6 +104,9 @@ app.put("/product", (req, res) => {
                 upload.array('images')
                 newUpdatedProduct.imageUrl = `http://localhost:8080/productImage/${req.file.filename}`
             }
+            //calculating price 
+            newUpdatedProduct.price = newUpdatedProduct.mrp - (newUpdatedProduct.discount + newUpdatedProduct.shippingCharge)
+
             //write to a file
             fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
                 if (err)
@@ -130,7 +157,7 @@ app.get("/product/:productId", (req, res) => {
     let id = req.params.productId
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
-    productData.map(productItem=>{
+    productData.map(productItem => {
         if (productItem.productId == id) {
             res.send(productItem)
         }
@@ -139,13 +166,13 @@ app.get("/product/:productId", (req, res) => {
 })
 
 //List all the products -GET
-app.get("/products",(req,res)=>{
+app.get("/products", (req, res) => {
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
     res.send(productData)
 })
 
-let port=8080
+let port = 8080
 app.listen(port, () => {
-    console.log("Listening at http://localhost:"+port)
+    console.log("Listening at http://localhost:" + port)
 })
