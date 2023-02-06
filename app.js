@@ -40,12 +40,17 @@ app.post("/product", (req, res) => {
     newProductDetails.price = req.body.mrp - (req.body.discount + req.body.shippingCharge)
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
+    productData.map(productItem=>{
+        if(productItem.productId==newProductDetails.productId){
+            res.status(400).send("product already exists with same Id")
+        }
+    })
     productData.push(newProductDetails)
     fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
         if (err)
             console.error(err)
     })
-    res.send(req.body)
+    res.status(201).send(newProductDetails)
 })
 
 app.put("/product", (req, res) => {
@@ -70,12 +75,39 @@ app.put("/product", (req, res) => {
                 if (err)
                     console.error(err)
             })
+            res.send(newUpdatedProduct)
+        }
+        else{
+            res.staus(404).send("No data found")
         }
     })
     res.send(newUpdatedProduct)
-    // res.status(201).json(newUpdatedProduct)
 })
 
+app.delete("/product/:productId", (req, res) => {
+    let id = req.params.productId
+    let productDataTxt = fs.readFileSync('products.json')
+    let productData = JSON.parse(productDataTxt)
+    for (i = 0; i < productData.length; i++) {
+        if (productData[i].productId == id) {
+            if (productData[i].hasOwnProperty("imageUrl")) {
+                let imageFileName = productData[i].imageUrl.split('/').pop()
+                fs.unlink("./upload/images" + imageFileName, err => {
+                    if (err) { console.error(err) }
+                })
+            }
+            productData.splice(i, 1)
+            fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
+                if (err)
+                    console.error(err)
+            })
+            res.send("Deleted the product with id " + id)
+        }else{
+            res.status(404).send("No data found")
+        }
+    }
+    res.end()
+})
 
 app.listen(4000, () => {
     console.log("Running.................")
