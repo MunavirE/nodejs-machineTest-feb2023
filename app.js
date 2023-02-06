@@ -48,6 +48,35 @@ app.post("/product", (req, res) => {
     res.send(req.body)
 })
 
+app.put("/product", (req, res) => {
+    let newUpdatedProduct = {}
+    let valuesToUpdate = req.body;
+    if (req.file) {
+        // console.log(req.file)
+        upload.single('image')
+        newProductDetails.imageUrl = `http://localhost:4000/productImage/${req.file.filename}`
+    }
+    let productDataTxt = fs.readFileSync('products.json')
+    let productData = JSON.parse(productDataTxt)
+    productData.map((productItem) => {
+        if (productItem.productId == valuesToUpdate.productId) {
+            newUpdatedProduct = Object.assign(productItem, valuesToUpdate)
+            if (req.file) {
+                // console.log(req.file)
+                upload.single('image')
+                newUpdatedProduct.imageUrl = `http://localhost:4000/productImage/${req.file.filename}`
+            }
+            fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
+                if (err)
+                    console.error(err)
+            })
+        }
+    })
+    res.send(newUpdatedProduct)
+    // res.status(201).json(newUpdatedProduct)
+})
+
+
 app.listen(4000, () => {
     console.log("Running.................")
 })
