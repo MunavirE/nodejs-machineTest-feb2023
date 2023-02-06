@@ -119,9 +119,7 @@ app.delete("/api/v1/product/:productId", (req, res) => {
                     console.error(err)
             })
             res.send("Deleted the product with id " + id)
-        } else {
-            res.status(404).send("No data found")
-        }
+        } 
     }
     res.end()
 })
