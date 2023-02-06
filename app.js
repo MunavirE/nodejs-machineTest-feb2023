@@ -35,7 +35,7 @@ app.use(bodyParser.json())
 app.use('/productImage', express.static('upload/images'));
 
 //Add product -POST
-app.post("/product", (req, res) => {
+app.post("api/v1/product", (req, res) => {
     //reading product details from DB
     let newProductDetails = req.body
     //File read from request and uplo
@@ -65,7 +65,7 @@ app.post("/product", (req, res) => {
 })
 
 //Update or edit product details -PUT
-app.put("/product", (req, res) => {
+app.put("api/v1/product", (req, res) => {
     let newUpdatedProduct = {}
     let valuesToUpdate = req.body;
     //Reading data from product json file
@@ -96,34 +96,11 @@ app.put("/product", (req, res) => {
             res.status(404).send("No data found")
         }
     }
-    productData.map((productItem) => {
-        if (productItem.productId == valuesToUpdate.productId) {
-            //Copying the existing product with the updated details
-            newUpdatedProduct = Object.assign(productItem, valuesToUpdate)
-            if (req.file) {
-                upload.array('images')
-                newUpdatedProduct.imageUrl = `http://localhost:8080/productImage/${req.file.filename}`
-            }
-            //calculating price 
-            newUpdatedProduct.price = newUpdatedProduct.mrp - (newUpdatedProduct.discount + newUpdatedProduct.shippingCharge)
-
-            //write to a file
-            fs.writeFile(__dirname + "/" + "products.json", JSON.stringify(productData), err => {
-                if (err)
-                    console.error(err)
-            })
-            //return response with updated details
-            res.send(newUpdatedProduct)
-        }
-        else {
-            res.status(404).send("No data found")
-        }
-    })
     res.end()
 })
 
 //delete the product -DELETE
-app.delete("/product/:productId", (req, res) => {
+app.delete("api/v1/product/:productId", (req, res) => {
     let id = req.params.productId
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -153,7 +130,7 @@ app.delete("/product/:productId", (req, res) => {
 })
 
 //get the specific product by Id -GET
-app.get("/product/:productId", (req, res) => {
+app.get("api/v1/product/:productId", (req, res) => {
     let id = req.params.productId
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -166,7 +143,7 @@ app.get("/product/:productId", (req, res) => {
 })
 
 //List all the products -GET
-app.get("/products", (req, res) => {
+app.get("api/v1/products", (req, res) => {
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
     res.send(productData)
