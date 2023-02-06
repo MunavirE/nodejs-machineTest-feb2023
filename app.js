@@ -35,16 +35,16 @@ app.use(bodyParser.json())
 app.use('/productImage', express.static('upload/images'));
 
 //Add product -POST
-app.post("api/v1/product", (req, res) => {
+app.post("/api/v1/product", upload.array('images'), (req, res) => {
     //reading product details from DB
     let newProductDetails = req.body
     //File read from request and uplo
-    if (req.file) {
+    if (req.files.length > 0) {
         upload.array('images')
-        newProductDetails.imageUrl = `http://localhost:8080/productImage/${req.file.filename}`
+        newProductDetails.imageUrl = `http://localhost:8080/productImage/${req.files[0].filename}`
     }
     //calculating price 
-    newProductDetails.price = req.body.mrp - (req.body.discount + req.body.shippingCharge)
+    newProductDetails.price = Number(req.body.mrp) - (Number(req.body.discount) + Number(req.body.shippingCharge))
     //read data from product json file
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -65,9 +65,10 @@ app.post("api/v1/product", (req, res) => {
 })
 
 //Update or edit product details -PUT
-app.put("api/v1/product", (req, res) => {
+app.put("/api/v1/product", upload.array('images'), (req, res) => {
     let newUpdatedProduct = {}
     let valuesToUpdate = req.body;
+    // console.log(valuesToUpdate)
     //Reading data from product json file
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -76,12 +77,11 @@ app.put("api/v1/product", (req, res) => {
         if (productData[i].productId == valuesToUpdate.productId) {
             //Copying the existing product with the updated details
             newUpdatedProduct = Object.assign(productData[i], valuesToUpdate)
-            if (req.file) {
-                upload.array('images')
-                newUpdatedProduct.imageUrl = `http://localhost:8080/productImage/${req.file.filename}`
+            if (req.files.length > 0) {
+                newUpdatedProduct.imageUrl = `http://localhost:8080/productImage/${req.files[0].filename}`
             }
             //calculating price 
-            newUpdatedProduct.price = newUpdatedProduct.mrp - (newUpdatedProduct.discount + newUpdatedProduct.shippingCharge)
+            newUpdatedProduct.price = Number(newUpdatedProduct.mrp) - (Number(newUpdatedProduct.discount) + Number(newUpdatedProduct.shippingCharge))
             //replace the existing product with the new updated product
             productData.splice(i, 1, newUpdatedProduct)
             //write to a file
@@ -92,15 +92,12 @@ app.put("api/v1/product", (req, res) => {
             //return response with updated details
             res.send(newUpdatedProduct)
         }
-        else {
-            res.status(404).send("No data found")
-        }
     }
-    res.end()
+    res.status(404).send("No data found")
 })
 
 //delete the product -DELETE
-app.delete("api/v1/product/:productId", (req, res) => {
+app.delete("/api/v1/product/:productId", (req, res) => {
     let id = req.params.productId
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -130,7 +127,7 @@ app.delete("api/v1/product/:productId", (req, res) => {
 })
 
 //get the specific product by Id -GET
-app.get("api/v1/product/:productId", (req, res) => {
+app.get("/api/v1/product/:productId", (req, res) => {
     let id = req.params.productId
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
@@ -143,7 +140,7 @@ app.get("api/v1/product/:productId", (req, res) => {
 })
 
 //List all the products -GET
-app.get("api/v1/products", (req, res) => {
+app.get("/api/v1/products", (req, res) => {
     let productDataTxt = fs.readFileSync('products.json')
     let productData = JSON.parse(productDataTxt)
     res.send(productData)
