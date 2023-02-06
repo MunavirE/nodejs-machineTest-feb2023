@@ -174,5 +174,5 @@ app.get("/products", (req, res) => {
 
 let port = 8080
 app.listen(port, () => {
-    console.log("Listening at http://localhost:" + port)
+    console.log(`Running at localhost:${port}`);
 })
