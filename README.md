@@ -18,11 +18,11 @@
 
 API
 ================================================================
-POST http://localhost:8080/api/v1/product
-PUT http://localhost:8080/api/v1/product
-GET http://localhost:8080/api/v1/product/:productId
-GET  http://localhost:8080/api/v1/products
-DELETE  http://localhost:8080/api/v1/product/:productId
+- POST http://localhost:8080/api/v1/product 
+- PUT http://localhost:8080/api/v1/product
+- GET http://localhost:8080/api/v1/product/:productId
+- GET  http://localhost:8080/api/v1/products
+- DELETE  http://localhost:8080/api/v1/product/:productId
 
 
 Note: the images are uploaded in the folder (./upload/images)
