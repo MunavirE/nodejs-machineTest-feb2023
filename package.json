@@ -2,7 +2,7 @@
   "name": "nodejs-machinetest-feb2023",
   "version": "1.0.0",
   "description": "Machine Test (Node js)",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js"
