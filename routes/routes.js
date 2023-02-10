@@ -115,6 +115,28 @@ router.patch('/update/:id', upload.array('images'), async (req, res) => {
             })
             updatedData.imageUrl = imageUrlList;
         }
+        //calculating product price
+        if (req.body.mrp != undefined || req.body.discount != undefined || req.body.shippingCharge != undefined) {
+            let mrp, discount, shippingCharge;
+            const productData = await Model.findById(id);
+            if (req.body.mrp == undefined) {
+                mrp = productData.mrp
+            } else {
+                mrp = req.body.mrp
+            }
+            if (req.body.discount == undefined) {
+                discount = productData.discount;
+            } else {
+                discount = req.body.discount
+            }
+            if (req.body.shippingCharge == undefined) {
+                shippingCharge = productData.shippingCharge;
+            } else {
+                shippingCharge = req.body.shippingCharge
+            }
+            updatedData.price = Number(mrp) - (Number(discount) + Number(shippingCharge))
+            console.log(updatedData)
+        }
         const result = await Model.findByIdAndUpdate(
             id, updatedData, options
         )
