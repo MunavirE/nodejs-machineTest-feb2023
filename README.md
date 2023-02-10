@@ -10,16 +10,16 @@ API
 
 ### index.js
 ================================================================
-It is the server side of the application
+- It is the server side of the application
 
 ### model/model.js
 ================================================================
-It contains the product schema to store in the mongodb data base
+- It contains the product schema to store in the mongodb data base
 
 ### routes/route.js
 ================================================================
-The API path and routes (controller file) are implemented in routes.js file 
+- The API path and routes (controller file) are implemented in routes.js file 
 
 ### upload/images
 ================================================================
-The product image is uploaded in this folder
+- The product image is uploaded in this folder
