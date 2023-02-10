@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "022365c5-dda5-4163-a253-603df22f8fc6",
+		"name": "nodeJs-API-CRUD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19551387"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/api/v1/product/7",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/product/63e6823b1106aeda7ce20e89",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"product",
+						"63e6823b1106aeda7ce20e89"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/v1/products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				},
+				"description": "List all products"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/v1/product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Levis",
+							"type": "text"
+						},
+						{
+							"key": "mrp",
+							"value": "1500",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Denim Type, Good Quality",
+							"type": "text"
+						},
+						{
+							"key": "discount",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "images",
+							"type": "file",
+							"src": [
+								"/D:/JOB/download.jpeg",
+								"/D:/JOB/shirtLinen.jpeg"
+							]
+						},
+						{
+							"key": "shippingCharge",
+							"value": "12",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/v1/product/63e6823b1106aeda7ce20e89",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Levis Pant",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Good Quality, Denim Product",
+							"type": "text"
+						},
+						{
+							"key": "discount",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "mrp",
+							"value": "1200",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/product/63e68d34fc1932a75f50612a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"product",
+						"63e68d34fc1932a75f50612a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/v1/product/63e6823b1106aeda7ce20e89",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/product/63e6823b1106aeda7ce20e89",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"product",
+						"63e6823b1106aeda7ce20e89"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
