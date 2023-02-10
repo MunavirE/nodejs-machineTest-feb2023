@@ -1,28 +1,25 @@
 # nodejs-machineTest-feb2023
 
-
-## products.json
-================================================================
-- It contains the list of products
-- Create , Read , Update , Delete and List the product based on the product json file
-- It array of product objects
-- product's attributes are 
-    - productId  //indexId
-    - name
-    - description
-    - price //mrp-(discount+shippingCharge)
-    - mrp
-    - discount 
-    - shippingCharge
-    - imageUrl
-
 API
 ================================================================
 - POST http://localhost:8080/api/v1/product 
-- PUT http://localhost:8080/api/v1/product
-- GET http://localhost:8080/api/v1/product/:productId
+- PATCH http://localhost:8080/api/v1/product/:id
+- GET http://localhost:8080/api/v1/product/:id
 - GET  http://localhost:8080/api/v1/products
-- DELETE  http://localhost:8080/api/v1/product/:productId
+- DELETE  http://localhost:8080/api/v1/product/:id
 
+### index.js
+================================================================
+It is the server side of the application
 
-Note: the images are uploaded in the folder (./upload/images)
+### model/model.js
+================================================================
+It contains the product schema to store in the mongodb data base
+
+### routes/route.js
+================================================================
+The API path and routes (controller file) are implemented in routes.js file 
+
+### upload/images
+================================================================
+The product image is uploaded in this folder
