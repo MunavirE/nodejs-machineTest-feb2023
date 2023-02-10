@@ -33,28 +33,25 @@ const upload = multer({
 })
 
 
-
 //Post Method
 router.post('/post', upload.array('images'), async (req, res) => {
-
-    const data = new Model({
+    let discount, shippingCharge
+    discount = shippingCharge = 0;
+    const productDetails = new Model({
         name: req.body.name,
         description: req.body.description,
-        mrp: req.body.mrp,
-        discount: req.body.discount,
-        shippingCharge: req.body.shippingCharge,
+        mrp: req.body.mrp
     })
-    let discount = req.body.discount
-    let shippingCharge = req.body.shippingCharge
-    if (discount == undefined) {
-        discount = 0;
+    //check the discount exist in json input
+    if (req.body.discount != undefined) {
+        productDetails.discount = req.body.discount
     }
-    if (shippingCharge === undefined) {
-        shippingCharge = 0;
+    //check the shippingCharge exist in json input
+    if (req.body.shippingCharge != undefined) {
+        productDetails.shippingCharge = req.body.shippingCharge
     }
-    // console.log(data)
-    data.price = Number(Number(req.body.mrp) - discount + shippingCharge)
-    console.log(req.files.length)
+    //calculate price for the product
+    productDetails.price = Number(Number(req.body.mrp) - discount + shippingCharge)
     //File read from request and uplo
     if (req.files.length > 0) {
         upload.array('images')
@@ -62,14 +59,17 @@ router.post('/post', upload.array('images'), async (req, res) => {
         req.files.map(imageItem => {
             imageUrlList.push(`http://localhost:8080/productImage/${imageItem.filename}`)
         })
-        data.imageUrl = imageUrlList;
+        productDetails.imageUrl = imageUrlList;
     }
     try {
-        let duplicateProductName = await Model.find({ name: data.name });
+        //Validating the duplicate name
+        let duplicateProductName = await Model.find({ name: productDetails.name });
+        //if duplicate name exist return conflict error
         if (duplicateProductName.length > 0) {
-            res.status(409).json({ message: `Already Exist the product with name: ${data.name}` });
+            res.status(409).json({ message: `Already Exist the product with name: ${productDetails.name}` });
         } else {
-            const dataToSave = await data.save();
+            //save to db
+            const dataToSave = await productDetails.save();
             res.status(200).json(dataToSave)
         }
     }
@@ -104,7 +104,7 @@ router.get('/getOne/:id', async (req, res) => {
 router.patch('/update/:id', upload.array('images'), async (req, res) => {
     try {
         const id = req.params.id;
-        const updatedData = req.body;
+        const newProductDetails = req.body;
         const options = { new: true };
         //File read from request and uplo
         if (req.files.length > 0) {
@@ -113,32 +113,36 @@ router.patch('/update/:id', upload.array('images'), async (req, res) => {
             req.files.map(imageItem => {
                 imageUrlList.push(`http://localhost:8080/productImage/${imageItem.filename}`)
             })
-            updatedData.imageUrl = imageUrlList;
+            newProductDetails.imageUrl = imageUrlList;
         }
         //calculating product price
         if (req.body.mrp != undefined || req.body.discount != undefined || req.body.shippingCharge != undefined) {
             let mrp, discount, shippingCharge;
+            //Fetch the product details from db to calculate new price
             const productData = await Model.findById(id);
+            //if updated data not contains the mrp, read  from productData else read from body
             if (req.body.mrp == undefined) {
                 mrp = productData.mrp
             } else {
                 mrp = req.body.mrp
             }
+            //if updated data not contains the dicount,read from product data else read from body
             if (req.body.discount == undefined) {
                 discount = productData.discount;
             } else {
                 discount = req.body.discount
             }
+            //if updated data not contains the shippingCharge,read from product data else read from body
             if (req.body.shippingCharge == undefined) {
                 shippingCharge = productData.shippingCharge;
             } else {
                 shippingCharge = req.body.shippingCharge
             }
-            updatedData.price = Number(mrp) - (Number(discount) + Number(shippingCharge))
-            console.log(updatedData)
+            //calculate price 
+            newProductDetails.price = Number(mrp) - (Number(discount) + Number(shippingCharge))
         }
         const result = await Model.findByIdAndUpdate(
-            id, updatedData, options
+            id, newProductDetails, options
         )
         res.send(result)
     }
@@ -151,12 +155,11 @@ router.patch('/update/:id', upload.array('images'), async (req, res) => {
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const data = await Model.findByIdAndDelete(id)
-        console.log(data)
-
-        if (data != null) {
-            if (data.hasOwnProperty("imageUrl")) {
-                data.imageUrl.map(item => {
+        const productData = await Model.findByIdAndDelete(id)
+        if (productData != null) {
+            //Deleting image file from the folder
+            if (productData.hasOwnProperty("imageUrl")) {
+                productData.imageUrl.map(item => {
                     let imageFileName = item.split('/').pop()
                     //delete image file from the directory
                     fs.unlink("./upload/images" + imageFileName, err => {
@@ -164,7 +167,7 @@ router.delete('/delete/:id', async (req, res) => {
                     })
                 })
             }
-            res.send(`Document with ${data.name} has been deleted..`)
+            res.send(`Document with ${productData.name} has been deleted..`)
         } else {
             res.status(404).send(`No data found with id :${id}`)
         }
