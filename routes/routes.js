@@ -34,7 +34,7 @@ const upload = multer({
 
 
 //Post Method
-router.post('/post', upload.array('images'), async (req, res) => {
+router.post('/product', upload.array('images'), async (req, res) => {
     let discount, shippingCharge
     discount = shippingCharge = 0;
     const productDetails = new Model({
@@ -79,7 +79,7 @@ router.post('/post', upload.array('images'), async (req, res) => {
 })
 
 //Get all Method
-router.get('/getAll', async (req, res) => {
+router.get('/products', async (req, res) => {
     try {
         const data = await Model.find();
         res.json(data)
@@ -90,7 +90,7 @@ router.get('/getAll', async (req, res) => {
 })
 
 //Get by ID Method
-router.get('/getOne/:id', async (req, res) => {
+router.get('/product/:id', async (req, res) => {
     try {
         const data = await Model.findById(req.params.id);
         res.json(data)
@@ -101,7 +101,7 @@ router.get('/getOne/:id', async (req, res) => {
 })
 
 //Update by ID Method
-router.patch('/update/:id', upload.array('images'), async (req, res) => {
+router.patch('/product/:id', upload.array('images'), async (req, res) => {
     try {
         const id = req.params.id;
         const newProductDetails = req.body;
@@ -120,26 +120,39 @@ router.patch('/update/:id', upload.array('images'), async (req, res) => {
             let mrp, discount, shippingCharge;
             //Fetch the product details from db to calculate new price
             const productData = await Model.findById(id);
-            //if updated data not contains the mrp, read  from productData else read from body
-            if (req.body.mrp == undefined) {
-                mrp = productData.mrp
-            } else {
-                mrp = req.body.mrp
+            if (productData != null) {
+                //if updated data not contains the mrp, read  from productData else read from body
+                if (req.body.mrp == undefined) {
+                    mrp = productData.mrp
+                } else {
+                    mrp = req.body.mrp
+                }
+                //if updated data not contains the dicount,read from product data else read from body
+                if (req.body.discount == undefined) {
+                    if ("discount" in productData) {
+                        discount = productData.discount;
+                    } else {
+                        discount = 0;
+                    }
+                } else {
+                    discount = req.body.discount
+                }
+                //if updated data not contains the shippingCharge,read from product data else read from body
+                if (req.body.shippingCharge == undefined) {
+                    if ("shippingCharge" in productData) {
+                        shippingCharge = productData.shippingCharge;
+                    } else {
+                        shippingCharge = 0;
+                    }
+                } else {
+                    shippingCharge = req.body.shippingCharge
+                }
+                //calculate price 
+                newProductDetails.price = Number(mrp) - (Number(discount) + Number(shippingCharge))
             }
-            //if updated data not contains the dicount,read from product data else read from body
-            if (req.body.discount == undefined) {
-                discount = productData.discount;
-            } else {
-                discount = req.body.discount
+            else {
+                throw new Error(`Provided id does not exist ${id}`)
             }
-            //if updated data not contains the shippingCharge,read from product data else read from body
-            if (req.body.shippingCharge == undefined) {
-                shippingCharge = productData.shippingCharge;
-            } else {
-                shippingCharge = req.body.shippingCharge
-            }
-            //calculate price 
-            newProductDetails.price = Number(mrp) - (Number(discount) + Number(shippingCharge))
         }
         const result = await Model.findByIdAndUpdate(
             id, newProductDetails, options
@@ -152,18 +165,18 @@ router.patch('/update/:id', upload.array('images'), async (req, res) => {
 })
 
 //Delete by ID Method
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/product/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const productData = await Model.findByIdAndDelete(id)
         if (productData != null) {
             //Deleting image file from the folder
-            if (productData.hasOwnProperty("imageUrl")) {
+            if ("imageUrl" in productData) {
                 productData.imageUrl.map(item => {
                     let imageFileName = item.split('/').pop()
                     //delete image file from the directory
-                    fs.unlink("./upload/images" + imageFileName, err => {
-                        if (err) { throw err }
+                    fs.unlink("./upload/images/" + imageFileName, error => {
+                        if (error) { throw error }
                     })
                 })
             }
